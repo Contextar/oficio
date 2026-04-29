@@ -1476,14 +1476,28 @@ function cerrarModal(e) {
 ['form-prof', 'form-cliente', 'form-resena'].forEach(id => {
   const form = document.getElementById(id);
   if (!form) return;
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const successId = id.replace('form-', 'success-');
-    const successEl = document.getElementById(successId);
-    if (successEl) {
-      successEl.style.display = 'block';
-      form.reset();
-      setTimeout(() => successEl.style.display = 'none', 6000);
+    const data = new FormData(form);
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        const successId = id.replace('form-', 'success-');
+        const successEl = document.getElementById(successId);
+        if (successEl) {
+          successEl.style.display = 'block';
+          form.reset();
+          setTimeout(() => successEl.style.display = 'none', 6000);
+        }
+      } else {
+        alert('Hubo un error al enviar. Intentá de nuevo.');
+      }
+    } catch(err) {
+      alert('Hubo un error de conexión. Intentá de nuevo.');
     }
   });
 });
